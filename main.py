@@ -1,4 +1,5 @@
 import flet as ft
+import pantalla_facturas as pf
 
 class UI(ft.UserControl):
     def __init__(self, page):
@@ -8,6 +9,16 @@ class UI(ft.UserControl):
             content=ft.TextField(hint_text="Nombre de la empresa", on_change=self.save_name),  # Campo de texto para el nombre de la empresa
             actions=[
                 ft.TextButton(text="Guardar", on_click=self.add_company),
+                ft.TextButton(text="Cancelar", on_click=self.dialog_close)
+            ],
+            actions_alignment=ft.MainAxisAlignment.END,
+        )
+        self.edit_dialog_a = ft.AlertDialog(  
+            modal=True,  # Nuevo cuadro de diálogo
+            visible=True,
+            content=ft.TextField(hint_text="Nombre de la empresa", on_change=self.save_name),  # Campo de texto para el nombre de la empresa
+            actions=[
+                ft.TextButton(text="Guardar", on_click=self.update_company),
                 ft.TextButton(text="Cancelar", on_click=self.dialog_close)
             ],
             actions_alignment=ft.MainAxisAlignment.END,
@@ -136,9 +147,16 @@ class UI(ft.UserControl):
         self.page.dialog=self.dialog
         self.dialog.open=True  # Muestra el cuadro de diálogo
         self.page.update()
+
+    def edit_dialog(self, event):
+        self.page.dialog=self.edit_dialog_a
+        self.edit_dialog_a.open=True  # Muestra el cuadro de diálogo
+        self.page.update()
+
     def dialog_close(self, event):
         self.dialog.open=False
         self.dialogAlert.open=False # Oculta el cuadro de diálogo
+        self.edit_dialog_a.open=False
         self.page.update()
 
     def save_name(self, event):
@@ -152,50 +170,67 @@ class UI(ft.UserControl):
             self.dialogAlert.open = True
             self.page.update()
         else:
-            self.tablaDatos.rows.append(
-                ft.DataRow(
-                    cells=[
-                        ft.DataCell(ft.Text(self.company_name)),
-                        ft.DataCell(ft.IconButton(icon=ft.icons.EDIT)),
-                        ft.DataCell(ft.IconButton(icon=ft.icons.DELETE)),
-                        ft.DataCell(ft.IconButton(icon=ft.icons.VISIBILITY)),
-                    ]
-                )
-            )
             self.lista_empresas.append(self.company_name)
+            self.cargar_tabla(self.company_name)
             self.tablaDatos.update()
             self.dialog_close(event)
+
+    def delete_company(self, event):
+        company_name = event.control.parent.parent.cells[0].content.value
+    # Get the company name from the first cell in the row
+        self.lista_empresas.remove(company_name)
+        self.tablaDatos.rows.clear()
+        for empresa in self.lista_empresas:
+            self.cargar_tabla(empresa)
+        self.tablaDatos.update()
+    
+    def edit_company(self, event):
+        self.old_company_name = event.control.parent.parent.cells[0].content.value
+
+        # Muestra un cuadro de diálogo para editar el nombre de la empresa
+        self.edit_dialog(event)
+
+    def update_company(self, event):
+        if self.company_name in self.lista_empresas:
+            self.dialog_close(event)
+            self.company_name = ""
+            self.page.dialog = self.dialogAlert
+            self.dialogAlert.open = True
+            self.page.update()
+        else:
+            self.lista_empresas.remove(self.old_company_name)
+            self.lista_empresas.append(self.company_name)
+            self.tablaDatos.rows.clear()
+            for empresa in self.lista_empresas:
+                self.cargar_tabla(empresa)
+            self.tablaDatos.update()
+            self.dialog_close(event)
+
     def searh_data(self, e):
             if len(e.data) == 0:
                 self.tablaDatos.rows.clear()
                 for empresa in self.lista_empresas:
-                    self.tablaDatos.rows.append(
-                        ft.DataRow(
-                            cells=[
-                                ft.DataCell(ft.Text(empresa)),
-                                ft.DataCell(ft.IconButton(icon=ft.icons.EDIT)),
-                                ft.DataCell(ft.IconButton(icon=ft.icons.DELETE)),
-                                ft.DataCell(ft.IconButton(icon=ft.icons.VISIBILITY)),
-                            ]
-                        )
-                    )
+                    self.cargar_tabla(empresa)
                 self.tablaDatos.update()
             else:
                 self.search = e.data.lower()
                 self.tablaDatos.rows.clear()
                 for empresa in self.lista_empresas:
                     if self.search == empresa.lower():
-                        self.tablaDatos.rows.append(
-                            ft.DataRow(
-                                cells=[
-                                    ft.DataCell(ft.Text(empresa)),
-                                    ft.DataCell(ft.IconButton(icon=ft.icons.EDIT)),
-                                    ft.DataCell(ft.IconButton(icon=ft.icons.DELETE)),
-                                    ft.DataCell(ft.IconButton(icon=ft.icons.VISIBILITY)),
-                                ]
-                            )
-                        )
+                        self.cargar_tabla(empresa)
                 self.tablaDatos.update()
+    def cargar_tabla(self, company_name):
+        self.tablaDatos.rows.append(
+            ft.DataRow(
+                cells=[
+                    ft.DataCell(ft.Text(company_name)),
+                    ft.DataCell(ft.IconButton(icon=ft.icons.EDIT, on_click=lambda event: self.edit_company(event))),
+                    ft.DataCell(ft.IconButton(icon=ft.icons.DELETE, on_click=lambda event: self.delete_company(event))),
+                    ft.DataCell(ft.IconButton(icon=ft.icons.VISIBILITY)),
+                ]
+            )
+        )
+        self.tablaDatos.update()
     def build(self):
         return self.container
 
