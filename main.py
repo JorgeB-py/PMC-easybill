@@ -143,6 +143,37 @@ class UI(ft.UserControl):
         self.container = ft.Column(
             controls=[self.navigation_bar, self.table, self.buttom],
         )
+    def go_facturas(self, e):
+        self.page.route="/facturas"
+        self.page.update()
+    
+    def route_change(self, route):
+        self.page.views.clear()
+        self.page.views.append(
+            ft.View(
+                "/",
+                [
+                    ft.AppBar(title=ft.Text("Flet app"), bgcolor=ft.colors.SURFACE_VARIANT),
+                    ft.ElevatedButton("Visit Store", on_click=lambda _: self.page.go("/store")),
+                ],
+            )
+        )
+        if self.page.route == "/store":
+            self.page.views.append(
+                ft.View(
+                    "/store",
+                    [
+                        ft.AppBar(title=ft.Text("Store"), bgcolor=ft.colors.SURFACE_VARIANT),
+                        ft.ElevatedButton("Go Home", on_click=lambda _: self.page.go("/")),
+                    ],
+                )
+            )
+        self.page.update()
+    def view_pop(self, view):
+        self.page.views.pop()
+        top_view = self.page.views[-1]
+        self.page.go(top_view.route)
+
     def open_dialog(self, event):
         self.page.dialog=self.dialog
         self.dialog.open=True  # Muestra el cuadro de diálogo
@@ -219,14 +250,14 @@ class UI(ft.UserControl):
                     if self.search == empresa.lower():
                         self.cargar_tabla(empresa)
                 self.tablaDatos.update()
-    def cargar_tabla(self, company_name):
+    def cargar_tabla(self,company_name):
         self.tablaDatos.rows.append(
             ft.DataRow(
                 cells=[
                     ft.DataCell(ft.Text(company_name)),
                     ft.DataCell(ft.IconButton(icon=ft.icons.EDIT, on_click=lambda event: self.edit_company(event))),
                     ft.DataCell(ft.IconButton(icon=ft.icons.DELETE, on_click=lambda event: self.delete_company(event))),
-                    ft.DataCell(ft.IconButton(icon=ft.icons.VISIBILITY)),
+                    ft.DataCell(ft.IconButton(icon=ft.icons.VISIBILITY, on_click=lambda event: self.go_facturas(event))),
                 ]
             )
         )
@@ -242,4 +273,4 @@ def main(page: ft.Page):
     page.add(UI(page))
 
 
-ft.app(main)
+ft.app(main, view=ft.AppView.WEB_BROWSER)
