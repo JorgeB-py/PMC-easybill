@@ -1,5 +1,6 @@
 import flet as ft
 import pantalla_facturas as pf
+import repath as rp
 
 class UI(ft.UserControl):
     def __init__(self, page):
@@ -128,6 +129,7 @@ class UI(ft.UserControl):
                             label_style = ft.TextStyle(color= "white"),
                             on_change = self.searh_data,
                         )
+        
         self.buttom=ft.Container(
                         expand=False,
                         padding=10,
@@ -143,32 +145,30 @@ class UI(ft.UserControl):
         self.container = ft.Column(
             controls=[self.navigation_bar, self.table, self.buttom],
         )
-    def go_facturas(self, e):
-        self.page.route="/facturas"
-        self.page.update()
+        self.page=page
+        self.page.on_route_change = self.route_change
+        self.page.on_view_pop = self.view_pop
+
+    def go_home(self,e):
+        self.page=e.page
+        self.page.go("/")
     
     def route_change(self, route):
         self.page.views.clear()
-        self.page.views.append(
-            ft.View(
-                "/",
-                [
-                    ft.AppBar(title=ft.Text("Flet app"), bgcolor=ft.colors.SURFACE_VARIANT),
-                    ft.ElevatedButton("Visit Store", on_click=lambda _: self.page.go("/store")),
-                ],
-            )
-        )
-        if self.page.route == "/store":
+        if self.page.route == "/facturas":
+            self.page.views.clear()
             self.page.views.append(
                 ft.View(
-                    "/store",
+                    "/facturas",
                     [
-                        ft.AppBar(title=ft.Text("Store"), bgcolor=ft.colors.SURFACE_VARIANT),
-                        ft.ElevatedButton("Go Home", on_click=lambda _: self.page.go("/")),
+                        ft.ElevatedButton("Go Home", on_click=lambda _: self.go_home(_)),
                     ],
                 )
             )
+        else:
+            self.page.views.append(ft.View(self.page.route, self.page.controls))
         self.page.update()
+
     def view_pop(self, view):
         self.page.views.pop()
         top_view = self.page.views[-1]
@@ -207,8 +207,7 @@ class UI(ft.UserControl):
             self.dialog_close(event)
 
     def delete_company(self, event):
-        company_name = event.control.parent.parent.cells[0].content.value
-    # Get the company name from the first cell in the row
+        company_name = event.control.parent.parent.cells[0].content.value # Get the company name from the first cell in the row
         self.lista_empresas.remove(company_name)
         self.tablaDatos.rows.clear()
         for empresa in self.lista_empresas:
@@ -257,7 +256,7 @@ class UI(ft.UserControl):
                     ft.DataCell(ft.Text(company_name)),
                     ft.DataCell(ft.IconButton(icon=ft.icons.EDIT, on_click=lambda event: self.edit_company(event))),
                     ft.DataCell(ft.IconButton(icon=ft.icons.DELETE, on_click=lambda event: self.delete_company(event))),
-                    ft.DataCell(ft.IconButton(icon=ft.icons.VISIBILITY, on_click=lambda event: self.go_facturas(event))),
+                    ft.DataCell(ft.IconButton(icon=ft.icons.VISIBILITY, on_click=lambda event: self.page.go("/facturas"))),
                 ]
             )
         )
@@ -273,4 +272,4 @@ def main(page: ft.Page):
     page.add(UI(page))
 
 
-ft.app(main, view=ft.AppView.WEB_BROWSER)
+ft.app(main)
