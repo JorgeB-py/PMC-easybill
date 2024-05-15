@@ -237,7 +237,12 @@ class UI(ft.UserControl):
         else:
             self.lista_empresas.append(self.company_name)
             folder_path = 'EasyBill/' + self.company_name
+            folder_facturadas=folder_path + '/facturadas'
+            folder_no_facturadas=folder_path + '/no_facturadas'
             os.makedirs(folder_path)
+            os.makedirs(folder_facturadas)
+            os.makedirs(folder_no_facturadas)
+            self.direcciones[self.company_name] = folder_path
             with open('EasyBill/empresas.csv', 'a', newline='') as file:
                 writer = csv.writer(file)
                 writer.writerow([self.company_name, folder_path])
