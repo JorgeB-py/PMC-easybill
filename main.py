@@ -1,10 +1,21 @@
 import flet as ft
 import pantalla_facturas as pf
 import repath as rp
+import os
+import csv
 
 class UI(ft.UserControl):
     def __init__(self, page):
         super().__init__(expand=True)
+
+        if not os.path.exists('EasyBill'):
+            os.makedirs('EasyBill')
+        
+        if not os.path.isfile('EasyBill/empresas.csv'):
+            with open('EasyBill/empresas.csv', 'w', newline='') as file:
+                writer = csv.writer(file)
+                writer.writerow(["Empresa", "Direccion"])
+
         self.dialog = ft.AlertDialog(  
             modal=True,  # Nuevo cuadro de diálogo
             content=ft.TextField(hint_text="Nombre de la empresa", on_change=self.save_name),  # Campo de texto para el nombre de la empresa
@@ -42,7 +53,19 @@ class UI(ft.UserControl):
                 actions_alignment=ft.MainAxisAlignment.END,
             )
         
-        self.lista_empresas=[]
+        self.lista_empresas=[] # Lista de empresas
+        self.direcciones={} # Diccionario de empresas y sus direcciones
+
+        with open('EasyBill/empresas.csv', 'r') as file:
+            reader = csv.reader(file)
+            i=0
+            for row in reader:
+                if i!=0: # Ignora la primera fila
+                    self.direcciones[row[0]] = row[1]
+                    self.lista_empresas.append(row[0])
+                i+=1
+
+
 
         self.navigation_bar=ft.Container(
             col=1,
@@ -121,6 +144,7 @@ class UI(ft.UserControl):
                 ]
             )
         )
+    
         self.searh_field = ft.TextField(                        
                             suffix_icon = ft.icons.SEARCH,
                             label= "Buscar por el nombre",
@@ -145,6 +169,9 @@ class UI(ft.UserControl):
         self.container = ft.Column(
             controls=[self.navigation_bar, self.table, self.buttom],
         )
+        if len(self.lista_empresas) > 0:
+            for empresa in self.lista_empresas:
+                self.cargar_tabla(empresa)
         self.page=page
         self.page.on_route_change = self.route_change
         self.page.on_view_pop = self.view_pop
@@ -152,6 +179,12 @@ class UI(ft.UserControl):
     def go_home(self,e):
         self.page=e.page
         self.page.go("/")
+    
+    def go_facturas(self, event):
+        self.page=event.page
+        # Nombre de la empresa y dirección de la carpeta
+        self.pantalla_facturas=pf.__view__(event.control.parent.parent.cells[0].content.value, self.direcciones[event.control.parent.parent.cells[0].content.value])
+        self.page.go("/facturas")
     
     def route_change(self, route):
         self.page.views.clear()
@@ -161,7 +194,8 @@ class UI(ft.UserControl):
                 ft.View(
                     "/facturas",
                     [
-                        ft.ElevatedButton("Go Home", on_click=lambda _: self.go_home(_)),
+                        self.pantalla_facturas,
+                        #ft.IconButton(icon=ft.icons.ARROW_BACK, on_click=self.go_home) # Botón para regresar a la pantalla principal (descomentar al final)
                     ],
                 )
             )
@@ -202,6 +236,11 @@ class UI(ft.UserControl):
             self.page.update()
         else:
             self.lista_empresas.append(self.company_name)
+            folder_path = 'EasyBill/' + self.company_name
+            os.makedirs(folder_path)
+            with open('EasyBill/empresas.csv', 'a', newline='') as file:
+                writer = csv.writer(file)
+                writer.writerow([self.company_name, folder_path])
             self.cargar_tabla(self.company_name)
             self.tablaDatos.update()
             self.dialog_close(event)
@@ -210,9 +249,20 @@ class UI(ft.UserControl):
         company_name = event.control.parent.parent.cells[0].content.value # Get the company name from the first cell in the row
         self.lista_empresas.remove(company_name)
         self.tablaDatos.rows.clear()
-        for empresa in self.lista_empresas:
-            self.cargar_tabla(empresa)
-        self.tablaDatos.update()
+        with open('EasyBill/empresas.csv', 'r') as f:
+            reader = csv.reader(f)
+            data = list(reader)
+
+    # Buscar la empresa y eliminarla
+        data = [row for row in data if row[0] != company_name]
+
+    # Escribir los datos de nuevo al archivo CSV
+        with open('EasyBill/empresas.csv', 'w', newline='') as f:
+            writer = csv.writer(f)
+            writer.writerows(data)
+            for empresa in self.lista_empresas:
+                self.cargar_tabla(empresa)
+            self.tablaDatos.update()
     
     def edit_company(self, event):
         self.old_company_name = event.control.parent.parent.cells[0].content.value
@@ -230,6 +280,26 @@ class UI(ft.UserControl):
         else:
             self.lista_empresas.remove(self.old_company_name)
             self.lista_empresas.append(self.company_name)
+            self.direcciones.pop(self.old_company_name)
+            folder_path = 'EasyBill/' + self.company_name
+            os.rename('EasyBill/' + self.old_company_name, folder_path)
+            self.direcciones[self.company_name] = folder_path
+            with open('empresas.csv', 'r') as f:
+                reader = csv.reader(f)
+                data = list(reader)
+
+    # Buscar la empresa y modificar sus datos
+            for row in data:
+                if row[0] == self.old_company_name:
+                    row[0] = self.company_name
+                    row[1] = folder_path
+                    break
+
+    # Escribir los datos de nuevo al archivo CSV
+            with open('empresas.csv', 'w', newline='') as f:
+                writer = csv.writer(f)
+                writer.writerows(data)
+            
             self.tablaDatos.rows.clear()
             for empresa in self.lista_empresas:
                 self.cargar_tabla(empresa)
@@ -256,11 +326,15 @@ class UI(ft.UserControl):
                     ft.DataCell(ft.Text(company_name)),
                     ft.DataCell(ft.IconButton(icon=ft.icons.EDIT, on_click=lambda event: self.edit_company(event))),
                     ft.DataCell(ft.IconButton(icon=ft.icons.DELETE, on_click=lambda event: self.delete_company(event))),
-                    ft.DataCell(ft.IconButton(icon=ft.icons.VISIBILITY, on_click=lambda event: self.page.go("/facturas"))),
+                    ft.DataCell(ft.IconButton(icon=ft.icons.VISIBILITY, on_click=lambda event: self.go_facturas(event))),
                 ]
             )
         )
-        self.tablaDatos.update()
+        try:
+            self.tablaDatos.update()
+        except:
+            pass
+
     def build(self):
         return self.container
 
