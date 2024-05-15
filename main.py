@@ -104,6 +104,8 @@ class UI(ft.UserControl):
             )
         )
         self.navigation_bar.content.controls[1].content.update()
+        self.dialog.open=False  # Oculta el cuadro de diálogo
+        self.page.update()
 
     def build(self):
         return self.container
