@@ -86,9 +86,6 @@ def __view__(page, nombre_empresa, direccion_carpeta):
         ],
         actions_alignment=ft.MainAxisAlignment.END,
     )
-    def go_home(e):
-        page=e.page
-        page.go("/")
 
     navigation_bar = ft.Container(
             col=1,
@@ -235,7 +232,6 @@ def __view__(page, nombre_empresa, direccion_carpeta):
     fila = ft.Row(
         alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
         vertical_alignment=ft.CrossAxisAlignment.CENTER,
-        spacing=250,
         wrap=True,
         width='100%',
         height='auto',
