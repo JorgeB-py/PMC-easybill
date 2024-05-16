@@ -1,0 +1,5 @@
+nombre: Factura importante
+Descripción: sdavberet
+Valor de la factura: 123456789
+Saldo en deuda: 123456789
+Fecha: 2024-05-23 00:00:00
