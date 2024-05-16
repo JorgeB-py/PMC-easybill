@@ -234,11 +234,18 @@ def __view__(page, nombre_empresa, direccion_carpeta):
     # Modificar la fila para incluir los botones
     fila = ft.Row(
         alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+        vertical_alignment=ft.CrossAxisAlignment.CENTER,
+        spacing=250,
+        wrap=True,
+        width='100%',
+        height='auto',
+        expand=True,
         controls=[
             fila_boton_tabla_1,
             ft.Column(controls=[boton_izquierda, boton_derecha]),
             fila_boton_tabla_2 
-        ]
+        ],
+        
     )
 
     table = ft.Container(
