@@ -295,6 +295,20 @@ def __view__(page, nombre_empresa, direccion_carpeta):
                 factura_seleccionada = selected_row
                 mover_factura(factura_seleccionada, direccion)
                 cargar_tablas()
+    
+    def on_dialog_result(e):
+        for file in e.files:
+            shutil.move(file.path, direccion_carpeta + direccion1)
+            cargar_tablas()
+    filepicker=ft.FilePicker(on_result=on_dialog_result)
+    page.overlay.append(filepicker)
+    page.update()
+    
+    def files_p(direccion):
+        global direccion1
+        direccion1=direccion
+        filepicker.pick_files(allow_multiple=True)
+
 
 
     # Crear los botones de flechas
@@ -304,22 +318,24 @@ def __view__(page, nombre_empresa, direccion_carpeta):
     # Crear botones de "Añadir elemento"
     boton_agregar_tabla_1 = ft.ElevatedButton(text="Crear Factura no facturada", on_click=open_dlg_modal)
     boton_agregar_tabla_2 = ft.ElevatedButton(text="Crear Factura facturada", on_click=open_dlg_modal_2)
+
+    # Crear botones cargar archivos
+    boton_agregar_archivos1= ft.ElevatedButton(text="Cargar archivos", on_click= lambda event: files_p("/no_facturadas"))
+    boton_agregar_archivos2= ft.ElevatedButton(text="Cargar archivos", on_click=lambda event: files_p("/facturadas"))
     
     # Crear filas para las tablas y botones
-    fila_boton_tabla_1 = ft.Column(controls=[titulo_tabla_1,tabla1,boton_agregar_tabla_1])
+    fila_boton_tabla_1 = ft.Column(controls=[titulo_tabla_1,tabla1,boton_agregar_tabla_1, boton_agregar_archivos1])
 
-    fila_boton_tabla_2 = ft.Column(controls=[titulo_tabla_2,tabla2, boton_agregar_tabla_2])
+    fila_boton_tabla_2 = ft.Column(controls=[titulo_tabla_2,tabla2, boton_agregar_tabla_2, boton_agregar_archivos2])
 
 
     # Modificar la fila para incluir los botones
     fila = ft.Row(
         alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
         vertical_alignment=ft.CrossAxisAlignment.CENTER,
-        wrap=True,
         spacing=100,
         width='100%',
         height='auto',
-        expand=True,
         controls=[
             fila_boton_tabla_1,
             ft.Column(controls=[boton_izquierda, boton_derecha]),

@@ -15,7 +15,6 @@ class UI(ft.UserControl):
             with open('EasyBill/empresas.csv', 'w', newline='') as file:
                 writer = csv.writer(file)
                 writer.writerow(["Empresa", "Direccion"])
-
         self.dialog = ft.AlertDialog(  
             modal=True,  # Nuevo cuadro de diálogo
             content=ft.TextField(hint_text="Nombre de la empresa", on_change=self.save_name),  # Campo de texto para el nombre de la empresa
@@ -344,11 +343,11 @@ class UI(ft.UserControl):
         return self.container
 
 def main(page: ft.Page):
-    page.window_max_height=1000
-    page.window_max_width=1400
     page.window_min_height=800
     page.window_min_width=1400
     page.theme_mode=ft.ThemeMode.LIGHT
+    file_picker = ft.FilePicker()
+    page.controls.append(file_picker)
     page.title = "EasyBill"
     page.add(UI(page))
 
