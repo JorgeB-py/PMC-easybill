@@ -183,7 +183,7 @@ class UI(ft.UserControl):
     def go_facturas(self, event):
         self.page=event.page
         # Nombre de la empresa y dirección de la carpeta
-        self.pantalla_facturas=pf.__view__(event.control.parent.parent.cells[0].content.value, self.direcciones[event.control.parent.parent.cells[0].content.value])
+        self.pantalla_facturas=pf.__view__(self.page, event.control.parent.parent.cells[0].content.value, self.direcciones[event.control.parent.parent.cells[0].content.value])
         self.page.go("/facturas")
     
     def route_change(self, route):
