@@ -4,7 +4,6 @@ import datetime
 from pathlib import Path
 import shutil
 
-
 def __view__(page, nombre_empresa, direccion_carpeta):
 
     def open_dlg_modal(e):
@@ -128,12 +127,27 @@ def __view__(page, nombre_empresa, direccion_carpeta):
         ]
         for archivo in archivos2
     ]
+    def get_index(e):
+        global selected_row
+        if e.control.selected:
+            e.control.selected = False
+        else:
+            e.control.selected = True
+        
+        name = e.control.cells[0].content.text
+
+        for row in datos1:
+            if row[0] == name:
+                selected_row = row
+                break
+        for row in datos2:
+            if row[0] == name:
+                selected_row = row
+                break
 
     tabla1 = ft.DataTable(
         show_checkbox_column= True,
         columns=[
-            ft.DataColumn(ft.Text("Seleccionar"),
-                          on_sort=lambda e: print(f"{e.column_index}, {e.ascending}"),),
             ft.DataColumn(
                 ft.Text("Factura"),
                 on_sort=lambda e: print(f"{e.column_index}, {e.ascending}"),
@@ -156,12 +170,13 @@ def __view__(page, nombre_empresa, direccion_carpeta):
                 # En sistemas no Windows, utilizar 'open' de acuerdo al tipo de archivo
                 import subprocess
                 subprocess.run(['open', file_path], check=True)
-
+    
 
     def cargar_tabla_1(nombre, fecha_mod):
         tabla1.rows.append(
             ft.DataRow(
-                cells=[ft.DataCell(ft.Checkbox()),
+                on_select_changed=get_index,
+                cells=[
                     ft.DataCell(ft.TextButton(text=(nombre), on_click=abrir_archivo(nombre))),
                     ft.DataCell(ft.Text(fecha_mod))
                         ]
@@ -178,10 +193,6 @@ def __view__(page, nombre_empresa, direccion_carpeta):
         show_checkbox_column= True,
             columns=[
                 ft.DataColumn(
-                    ft.Text("Seleccionar"),
-                    on_sort=lambda e: print(f"{e.column_index}, {e.ascending}"),
-                ),
-                ft.DataColumn(
                     ft.Text("Factura"),
                     on_sort=lambda e: print(f"{e.column_index}, {e.ascending}"),
                 ),
@@ -192,11 +203,12 @@ def __view__(page, nombre_empresa, direccion_carpeta):
             ]
     )
 
+
     def cargar_tabla_2(nombre, fecha_mod):
         tabla2.rows.append(
             ft.DataRow(
+                on_select_changed=get_index,
                 cells=[
-                    ft.DataCell(ft.Checkbox()),
                     ft.DataCell(ft.TextButton(text=(nombre), on_click=abrir_archivo(nombre))),
                     ft.DataCell(ft.Text(fecha_mod))
                         ]
@@ -215,20 +227,81 @@ def __view__(page, nombre_empresa, direccion_carpeta):
         for i in range(len(archivos)):
             with open(direccion_carpeta + "/no_facturadas/" + archivos[i], "r") as archivo:
                 datos = archivo.readlines()
-                nombre = datos[0].split(":")[1].strip()
+                nombre = archivos[i]
                 fecha1 = datetime.datetime.strptime(datos[4].split(":", 1)[1].strip(), '%Y-%m-%d %H:%M:%S')
                 cargar_tabla_1(nombre,fecha1)
     if len(archivos2)>0:
         for i in range(len(archivos2)):
             with open(direccion_carpeta + "/facturadas/" + archivos2[i], "r") as archivo:
                 datos = archivo.readlines()
-                nombre = datos[0].split(":")[1].strip()
+                nombre = archivos2[i]
                 fecha1 = datetime.datetime.strptime(datos[4].split(":", 1)[1].strip(), '%Y-%m-%d %H:%M:%S')
                 cargar_tabla_2(nombre,fecha1)
+    
+    def cargar_tablas():
+        archivos = os.listdir(direccion_carpeta + "/no_facturadas/")
+        datos1 = [
+            [
+                archivo,
+                datetime.datetime.fromtimestamp(os.path.getmtime(os.path.join(direccion_carpeta + "/no_facturadas/" + archivo)))
+            ]
+            for archivo in archivos
+        ]
+
+
+        archivos2 = os.listdir(direccion_carpeta + "/facturadas/")
+        datos2 = [
+            [
+                archivo,
+                datetime.datetime.fromtimestamp(os.path.getmtime(os.path.join(direccion_carpeta + "/facturadas/" + archivo)))
+            ]
+            for archivo in archivos2
+        ]
+        tabla1.rows.clear()
+        tabla2.rows.clear()
+        if len(archivos)>0:
+            for i in range(len(archivos)):
+                with open(direccion_carpeta + "/no_facturadas/" + archivos[i], "r") as archivo:
+                    datos = archivo.readlines()
+                    nombre = archivos[i]
+                    fecha1 = datetime.datetime.strptime(datos[4].split(":", 1)[1].strip(), '%Y-%m-%d %H:%M:%S')
+                    cargar_tabla_1(nombre,fecha1)
+        if len(archivos2)>0:
+            for i in range(len(archivos2)):
+                with open(direccion_carpeta + "/facturadas/" + archivos2[i], "r") as archivo:
+                    datos = archivo.readlines()
+                    nombre = archivos2[i]
+                    fecha1 = datetime.datetime.strptime(datos[4].split(":", 1)[1].strip(), '%Y-%m-%d %H:%M:%S')
+                    cargar_tabla_2(nombre,fecha1)
+    
+    
+    def mover_archivo(nombre_archivo, origen, destino):
+        origen_archivo = Path(origen) / nombre_archivo[0]
+        destino_archivo = Path(destino) / nombre_archivo[0]
+        shutil.move(origen_archivo, destino_archivo)
+
+    def mover_factura(nombre_factura, direccion):
+        if direccion == 'izquierda':
+            mover_archivo(nombre_factura, 'EasyBill/'+nombre_empresa+'/facturadas', 'EasyBill/'+nombre_empresa+'/no_facturadas')
+        elif direccion == 'derecha':
+            mover_archivo(nombre_factura, 'EasyBill/'+nombre_empresa+'/no_facturadas', 'EasyBill/'+nombre_empresa+'/facturadas')
+
+    def mover_factura_seleccionada(direccion):
+        if direccion == 'izquierda':
+            if selected_row is not None:
+                factura_seleccionada = selected_row
+                mover_factura(factura_seleccionada, direccion)
+                cargar_tablas()
+        elif direccion == 'derecha':
+            if selected_row is not None:
+                factura_seleccionada = selected_row
+                mover_factura(factura_seleccionada, direccion)
+                cargar_tablas()
+
 
     # Crear los botones de flechas
-    boton_izquierda = ft.IconButton(icon=ft.icons.ARROW_LEFT,)
-    boton_derecha = ft.IconButton(icon=ft.icons.ARROW_RIGHT,)
+    boton_izquierda = ft.IconButton(icon=ft.icons.ARROW_LEFT, on_click=lambda event: mover_factura_seleccionada('izquierda'))
+    boton_derecha = ft.IconButton(icon=ft.icons.ARROW_RIGHT, on_click=lambda event : mover_factura_seleccionada('derecha'))
 
     # Crear botones de "Añadir elemento"
     boton_agregar_tabla_1 = ft.ElevatedButton(text="Crear Factura no facturada", on_click=open_dlg_modal)
