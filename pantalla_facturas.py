@@ -4,6 +4,7 @@ import datetime
 from pathlib import Path
 import shutil
 
+
 def __view__(page, nombre_empresa, direccion_carpeta):
 
     def open_dlg_modal(e):
@@ -156,6 +157,7 @@ def __view__(page, nombre_empresa, direccion_carpeta):
                 import subprocess
                 subprocess.run(['open', file_path], check=True)
 
+
     def cargar_tabla_1(nombre, fecha_mod):
         tabla1.rows.append(
             ft.DataRow(
@@ -206,14 +208,24 @@ def __view__(page, nombre_empresa, direccion_carpeta):
         except:
             pass
 
-    titulo_tabla_1 = ft.Text(value="NO Facturadas",size=35,weight=ft.FontWeight.BOLD)
+    titulo_tabla_1 = ft.Text(value="No Facturadas",size=35,weight=ft.FontWeight.BOLD)
     titulo_tabla_2 = ft.Text(value="Facturadas",size=35,weight=ft.FontWeight.BOLD)
 
-    for archivo in datos1:
-        cargar_tabla_1(archivo[0],archivo[1].strftime('%d/%m/%Y %H:%M'))
+    if len(archivos)>0:
+        for i in range(len(archivos)):
+            with open(direccion_carpeta + "/no_facturadas/" + archivos[i], "r") as archivo:
+                datos = archivo.readlines()
+                nombre = datos[0].split(":")[1].strip()
+                fecha1 = datetime.datetime.strptime(datos[4].split(":", 1)[1].strip(), '%Y-%m-%d %H:%M:%S')
+                cargar_tabla_1(nombre,fecha1)
+    if len(archivos2)>0:
+        for i in range(len(archivos2)):
+            with open(direccion_carpeta + "/facturadas/" + archivos2[i], "r") as archivo:
+                datos = archivo.readlines()
+                nombre = datos[0].split(":")[1].strip()
+                fecha1 = datetime.datetime.strptime(datos[4].split(":", 1)[1].strip(), '%Y-%m-%d %H:%M:%S')
+                cargar_tabla_2(nombre,fecha1)
 
-    for archivo in datos2:
-        cargar_tabla_2(archivo[0],archivo[1].strftime('%d/%m/%Y %H:%M'))
     # Crear los botones de flechas
     boton_izquierda = ft.IconButton(icon=ft.icons.ARROW_LEFT,)
     boton_derecha = ft.IconButton(icon=ft.icons.ARROW_RIGHT,)
@@ -233,6 +245,7 @@ def __view__(page, nombre_empresa, direccion_carpeta):
         alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
         vertical_alignment=ft.CrossAxisAlignment.CENTER,
         wrap=True,
+        spacing=100,
         width='100%',
         height='auto',
         expand=True,
@@ -243,14 +256,6 @@ def __view__(page, nombre_empresa, direccion_carpeta):
         ],
         
     )
-
-    table = ft.Container(
-            border_radius=10,
-            padding= 10,
-            col = 8,
-            expand=True,
-            content= fila
-            )
 
     respuesta=ft.Column(
         controls=[

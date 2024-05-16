@@ -194,8 +194,8 @@ class UI(ft.UserControl):
                 ft.View(
                     "/facturas",
                     [
-                        self.pantalla_facturas,
-                        ft.IconButton(icon=ft.icons.ARROW_BACK, on_click=self.go_home) # Botón para regresar a la pantalla principal (descomentar al final)
+                        ft.IconButton(icon=ft.icons.ARROW_BACK, on_click=self.go_home),
+                        self.pantalla_facturas, # Botón para regresar a la pantalla principal (descomentar al final)
                     ],
                 )
             )
@@ -345,9 +345,9 @@ class UI(ft.UserControl):
 
 def main(page: ft.Page):
     page.window_max_height=1000
-    page.window_max_width=1340
-    page.window_min_height=1000
-    page.window_min_height=1340
+    page.window_max_width=1400
+    page.window_min_height=800
+    page.window_min_width=1400
     page.theme_mode=ft.ThemeMode.LIGHT
     page.title = "EasyBill"
     page.add(UI(page))
