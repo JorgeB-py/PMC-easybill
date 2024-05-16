@@ -226,17 +226,17 @@ def __view__(page, nombre_empresa, direccion_carpeta):
     if len(archivos)>0:
         for i in range(len(archivos)):
             with open(direccion_carpeta + "/no_facturadas/" + archivos[i], "r") as archivo:
-                datos = archivo.readlines()
                 nombre = archivos[i]
-                fecha1 = datetime.datetime.strptime(datos[4].split(":", 1)[1].strip(), '%Y-%m-%d %H:%M:%S')
-                cargar_tabla_1(nombre,fecha1)
+                archivo_path = 'EasyBill/'+nombre_empresa+'/no_facturadas/'+nombre
+                fecha_creacion = datetime.datetime.fromtimestamp(os.path.getctime(archivo_path))
+                cargar_tabla_1(nombre,fecha_creacion)
     if len(archivos2)>0:
         for i in range(len(archivos2)):
             with open(direccion_carpeta + "/facturadas/" + archivos2[i], "r") as archivo:
-                datos = archivo.readlines()
                 nombre = archivos2[i]
-                fecha1 = datetime.datetime.strptime(datos[4].split(":", 1)[1].strip(), '%Y-%m-%d %H:%M:%S')
-                cargar_tabla_2(nombre,fecha1)
+                archivo_path = 'EasyBill/'+nombre_empresa+'/facturadas/'+nombre
+                fecha_creacion = datetime.datetime.fromtimestamp(os.path.getctime(archivo_path))
+                cargar_tabla_2(nombre,fecha_creacion)
     
     def cargar_tablas():
         archivos = os.listdir(direccion_carpeta + "/no_facturadas/")
@@ -261,18 +261,16 @@ def __view__(page, nombre_empresa, direccion_carpeta):
         tabla2.rows.clear()
         if len(archivos)>0:
             for i in range(len(archivos)):
-                with open(direccion_carpeta + "/no_facturadas/" + archivos[i], "r") as archivo:
-                    datos = archivo.readlines()
-                    nombre = archivos[i]
-                    fecha1 = datetime.datetime.strptime(datos[4].split(":", 1)[1].strip(), '%Y-%m-%d %H:%M:%S')
-                    cargar_tabla_1(nombre,fecha1)
+                nombre = archivos[i]
+                archivo_path = 'EasyBill/'+nombre_empresa+'/no_facturadas/'+nombre
+                fecha_creacion = datetime.datetime.fromtimestamp(os.path.getctime(archivo_path))
+                cargar_tabla_1(nombre,fecha_creacion)
         if len(archivos2)>0:
             for i in range(len(archivos2)):
-                with open(direccion_carpeta + "/facturadas/" + archivos2[i], "r") as archivo:
-                    datos = archivo.readlines()
-                    nombre = archivos2[i]
-                    fecha1 = datetime.datetime.strptime(datos[4].split(":", 1)[1].strip(), '%Y-%m-%d %H:%M:%S')
-                    cargar_tabla_2(nombre,fecha1)
+                nombre1 = archivos2[i]
+                archivo_path1 = 'EasyBill/'+nombre_empresa+'/facturadas/'+nombre1
+                fecha_creacion = datetime.datetime.fromtimestamp(os.path.getctime(archivo_path1))
+                cargar_tabla_2(nombre1,fecha_creacion)
     
     
     def mover_archivo(nombre_archivo, origen, destino):
