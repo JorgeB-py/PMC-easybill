@@ -129,22 +129,30 @@ def __view__(page, nombre_empresa, direccion_carpeta):
         return datos
 
     tabla1 = ft.DataTable(
-        columns=[
-            ft.DataColumn(ft.Text('Nombre')),
-            ft.DataColumn(ft.Text('Fecha de modificación')),
-        ],
-        data=get_data_no_facturadas(direccion_carpeta),
+    columns=[
+        ft.DataColumn(ft.Text('Nombre')),
+        ft.DataColumn(ft.Text('Fecha de modificación')),
+    ],
+    data=get_data_no_facturadas(direccion_carpeta),
+    border=ft.border.all(1, 'black'),
+    border_radius=10,
+    horizontal_lines=ft.border.BorderSide(1, 'black'),
+    sort_ascending=True,
     )
 
     tabla2 = ft.DataTable(
-        show_checkbox_column=True,
-        columns=[
-            ft.DataColumn(ft.Text('Nombre')),
-            ft.DataColumn(ft.Text('Fecha de modificación')),
-        ],
-        data=get_data_facturadas(direccion_carpeta),
+    show_checkbox_column=True,
+    columns=[
+        ft.DataColumn(ft.Text('Nombre')),
+        ft.DataColumn(ft.Text('Fecha de modificación')),
+    ],
+    data=get_data_facturadas(direccion_carpeta),
+    border=ft.border.all(1, 'black'),
+    border_radius=10,
+    horizontal_lines=ft.border.BorderSide(1, 'black'),
+    sort_ascending=True,
     )
-    titulo_tabla_1 = ft.Text(value="NO Facturadas",size=35,weight=ft.FontWeight.BOLD)
+    titulo_tabla_1 = ft.Text(value="No Facturadas",size=35,weight=ft.FontWeight.BOLD)
     titulo_tabla_2 = ft.Text(value="Facturadas",size=35,weight=ft.FontWeight.BOLD)
 
     # Crear la tabla
@@ -166,11 +174,18 @@ def __view__(page, nombre_empresa, direccion_carpeta):
     # Modificar la fila para incluir los botones
     fila = ft.Row(
         alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+        vertical_alignment=ft.CrossAxisAlignment.CENTER,
+        spacing=250,
+        wrap=True,
+        width='100%',
+        height='auto',
+        expand=True,
         controls=[
             fila_boton_tabla_1,
             ft.Column(controls=[boton_izquierda, boton_derecha]),
             fila_boton_tabla_2 
-        ]
+        ],
+        
     )
 
     table = ft.Container(
