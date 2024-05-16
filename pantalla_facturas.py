@@ -34,7 +34,6 @@ def __view__(page, nombre_empresa, direccion_carpeta):
     descripcion = ft.TextField(label="Descripción")
     valor_factura = ft.TextField(label = "Valor a cobrar")
     fecha = ft.DatePicker(open = True)
-    fecha_valor = ft.Text(value=fecha.value)
 
     def agregar_archivo_no_facturadas(e):
         if nombre_archivo.value != "":
@@ -107,27 +106,43 @@ def __view__(page, nombre_empresa, direccion_carpeta):
     archivos = os.listdir(direccion_carpeta + "/no_facturadas/")
 
     # Crear una lista de diccionarios con los nombres de los archivos y las fechas de modificación
-    datos = [
-        [
-            archivo,
-            datetime.datetime.fromtimestamp(os.path.getmtime(os.path.join(direccion_carpeta + "/no_facturadas/" + archivo)))
-    ]
-        for archivo in archivos
-    ]
+    def get_data_no_facturadas(direccion_carpeta):
+        archivos = os.listdir(direccion_carpeta + "/no_facturadas/")
+        datos = [
+            [
+                archivo,
+                datetime.datetime.fromtimestamp(os.path.getmtime(os.path.join(direccion_carpeta + "/no_facturadas/" + archivo)))
+            ]
+            for archivo in archivos
+        ]
+        return datos
+
+    def get_data_facturadas(direccion_carpeta):
+        archivos = os.listdir(direccion_carpeta + "/facturadas/")
+        datos = [
+            [
+                archivo,
+                datetime.datetime.fromtimestamp(os.path.getmtime(os.path.join(direccion_carpeta + "/facturadas/" + archivo)))
+            ]
+            for archivo in archivos
+        ]
+        return datos
+
     tabla1 = ft.DataTable(
         columns=[
             ft.DataColumn(ft.Text('Nombre')),
             ft.DataColumn(ft.Text('Fecha de modificación')),
         ],
-        data=(dato for dato in datos),
+        data=get_data_no_facturadas(direccion_carpeta),
     )
 
     tabla2 = ft.DataTable(
-        data=datos,
+        show_checkbox_column=True,
         columns=[
             ft.DataColumn(ft.Text('Nombre')),
             ft.DataColumn(ft.Text('Fecha de modificación')),
-        ]
+        ],
+        data=get_data_facturadas(direccion_carpeta),
     )
     titulo_tabla_1 = ft.Text(value="NO Facturadas",size=35,weight=ft.FontWeight.BOLD)
     titulo_tabla_2 = ft.Text(value="Facturadas",size=35,weight=ft.FontWeight.BOLD)
@@ -176,13 +191,6 @@ def __view__(page, nombre_empresa, direccion_carpeta):
 
     return respuesta
 
-def agregar_elemento_tabla_1(direccion_carpeta):
-    # Implementar la lógica para agregar un elemento a la tabla 1
-    folder_no_facturadas = direccion_carpeta + '/no_facturadas'
-    
-    
-def agregar_elemento_tabla_2(direccion_carpeta):
-    folder_facturadas = direccion_carpeta + '/facturadas'
 
 
     

@@ -1,0 +1,5 @@
+nombre: seefewsf
+Descripción: asgdafdvgad
+Valor de la factura: 1234567
+Saldo en deuda: 1234567
+Fecha: 2024-05-22 00:00:00
