@@ -244,16 +244,11 @@ class UI(ft.UserControl):
             os.makedirs(folder_no_facturadas)
         
             # Crear los archivos .csv y añadir las columnas
-            facturadas_file = os.path.join(folder_path, 'facturadas.csv')
-            no_facturadas_file = os.path.join(folder_path, 'no_facturadas.csv')
+            facturadas_file = os.path.join(folder_path, 'registro.csv')
         
             with open(facturadas_file, 'w', newline='') as file:
                 writer = csv.writer(file)
-                writer.writerow(["nombre_factura", "fecha_limite"])
-        
-            with open(no_facturadas_file, 'w', newline='') as file:
-                writer = csv.writer(file)
-                writer.writerow(["nombre_factura", "fecha_limite"])
+                writer.writerow(["nombre_factura", "fecha_limite", "facturado"])
 
             self.direcciones[self.company_name] = folder_path
             with open('EasyBill/empresas.csv', 'a', newline='') as file:
