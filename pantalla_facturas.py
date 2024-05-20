@@ -46,7 +46,7 @@ def __view__(page, nombre_empresa, direccion_carpeta):
             ruta_archivo = os.path.join(direccion_carpeta + "/no_facturadas/" + nombre_archivo.value + ".txt")
             with open(ruta_archivo, "w") as archivo:
                 archivo.write(f"nombre: {nombre_archivo.value}\nDescripción: {descripcion.value}\nValor de la factura: {valor_factura.value}\nSaldo en deuda: {valor_factura.value}\nFecha: {fecha.value}\n")
-        cargar_tabla_1(nombre_archivo.value+ ".txt", datetime.datetime.fromtimestamp(os.path.getmtime(os.path.join(direccion_carpeta + "/no_facturadas/" + nombre_archivo.value+".txt"))).strftime('%d/%m/%Y %H:%M'))
+        cargar_tabla_1(nombre_archivo.value + ".txt", datetime.datetime.fromtimestamp(os.path.getmtime(os.path.join(direccion_carpeta + "/no_facturadas/" + nombre_archivo.value + ".txt"))).strftime('%d/%m/%Y %H:%M'))
         dlg_modal.open = False
         nombre_archivo.value = ""
         descripcion.value = ""
@@ -59,7 +59,7 @@ def __view__(page, nombre_empresa, direccion_carpeta):
             ruta_archivo = os.path.join(direccion_carpeta + "/facturadas/" + nombre_archivo.value + ".txt")
             with open(ruta_archivo, "w") as archivo:
                 archivo.write(f"nombre: {nombre_archivo.value}\nDescripción: {descripcion.value}\nValor de la factura: {valor_factura.value}\nSaldo en deuda: 0\nFecha: {fecha.value}\n")
-        cargar_tabla_2(nombre_archivo.value+ ".txt", datetime.datetime.fromtimestamp(os.path.getmtime(os.path.join(direccion_carpeta + "/facturadas/" + nombre_archivo.value+".txt"))).strftime('%d/%m/%Y %H:%M'))
+        cargar_tabla_2(nombre_archivo.value + ".txt", datetime.datetime.fromtimestamp(os.path.getmtime(os.path.join(direccion_carpeta + "/facturadas/" + nombre_archivo.value + ".txt"))).strftime('%d/%m/%Y %H:%M'))
         dlg_modal_2.open = False
         nombre_archivo.value = ""
         descripcion.value = ""
@@ -232,14 +232,14 @@ def __view__(page, nombre_empresa, direccion_carpeta):
         for i in range(len(archivos)):
             with open(direccion_carpeta + "/no_facturadas/" + archivos[i], "r") as archivo:
                 nombre = archivos[i]
-                archivo_path = 'EasyBill/'+nombre_empresa+'/no_facturadas/'+nombre
+                archivo_path = 'EasyBill/' + nombre_empresa + '/no_facturadas/' + nombre
                 fecha_creacion = datetime.datetime.fromtimestamp(os.path.getctime(archivo_path))
                 cargar_tabla_1(nombre, fecha_creacion)
     if len(archivos2) > 0:
         for i in range(len(archivos2)):
             with open(direccion_carpeta + "/facturadas/" + archivos2[i], "r") as archivo:
                 nombre = archivos2[i]
-                archivo_path = 'EasyBill/'+nombre_empresa+'/facturadas/'+nombre
+                archivo_path = 'EasyBill/' + nombre_empresa + '/facturadas/' + nombre
                 fecha_creacion = datetime.datetime.fromtimestamp(os.path.getctime(archivo_path))
                 cargar_tabla_2(nombre, fecha_creacion)
 
@@ -259,6 +259,19 @@ def __view__(page, nombre_empresa, direccion_carpeta):
         for row in selected_rows:
             nombre_factura = row[0]
             mover_factura(nombre_factura, direccion)
+        cargar_tablas()
+        selected_rows = []
+
+    def eliminar_facturas_seleccionadas(e):
+        global selected_rows
+        for row in selected_rows:
+            nombre_factura = row[0]
+            ruta_archivo_no_facturadas = Path(direccion_carpeta) / "no_facturadas" / nombre_factura
+            ruta_archivo_facturadas = Path(direccion_carpeta) / "facturadas" / nombre_factura
+            if ruta_archivo_no_facturadas.exists():
+                os.remove(ruta_archivo_no_facturadas)
+            if ruta_archivo_facturadas.exists():
+                os.remove(ruta_archivo_facturadas)
         cargar_tablas()
         selected_rows = []
 
@@ -297,6 +310,9 @@ def __view__(page, nombre_empresa, direccion_carpeta):
     boton_izquierda = ft.IconButton(icon=ft.icons.ARROW_LEFT, on_click=lambda event: mover_facturas_seleccionadas('izquierda'))
     boton_derecha = ft.IconButton(icon=ft.icons.ARROW_RIGHT, on_click=lambda event: mover_facturas_seleccionadas('derecha'))
 
+    # Crear botón de eliminación
+    boton_eliminar = ft.ElevatedButton(text="Eliminar Facturas Seleccionadas", on_click=eliminar_facturas_seleccionadas)
+
     # Crear botones de "Añadir elemento"
     boton_agregar_tabla_1 = ft.ElevatedButton(text="Crear Factura no facturada", on_click=open_dlg_modal)
     boton_agregar_tabla_2 = ft.ElevatedButton(text="Crear Factura facturada", on_click=open_dlg_modal_2)
@@ -319,7 +335,7 @@ def __view__(page, nombre_empresa, direccion_carpeta):
         height='auto',
         controls=[
             fila_boton_tabla_1,
-            ft.Column(controls=[boton_izquierda, boton_derecha]),
+            ft.Column(controls=[boton_izquierda, boton_derecha, boton_eliminar]),
             fila_boton_tabla_2
         ],
 
