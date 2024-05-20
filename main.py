@@ -236,15 +236,30 @@ class UI(ft.UserControl):
         else:
             self.lista_empresas.append(self.company_name)
             folder_path = 'EasyBill/' + self.company_name
-            folder_facturadas=folder_path + '/facturadas'
-            folder_no_facturadas=folder_path + '/no_facturadas'
+            folder_facturadas = folder_path + '/facturadas'
+            folder_no_facturadas = folder_path + '/no_facturadas'
+        
             os.makedirs(folder_path)
             os.makedirs(folder_facturadas)
             os.makedirs(folder_no_facturadas)
+        
+            # Crear los archivos .csv y añadir las columnas
+            facturadas_file = os.path.join(folder_path, 'facturadas.csv')
+            no_facturadas_file = os.path.join(folder_path, 'no_facturadas.csv')
+        
+            with open(facturadas_file, 'w', newline='') as file:
+                writer = csv.writer(file)
+                writer.writerow(["nombre_factura", "fecha_limite"])
+        
+            with open(no_facturadas_file, 'w', newline='') as file:
+                writer = csv.writer(file)
+                writer.writerow(["nombre_factura", "fecha_limite"])
+
             self.direcciones[self.company_name] = folder_path
             with open('EasyBill/empresas.csv', 'a', newline='') as file:
                 writer = csv.writer(file)
                 writer.writerow([self.company_name, folder_path])
+        
             self.cargar_tabla(self.company_name)
             self.tablaDatos.update()
             self.dialog_close(event)
