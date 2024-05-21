@@ -1,5 +1,0 @@
-nombre: 8
-Descripción: 
-Valor de la factura: 
-Saldo en deuda: 
-Fecha: 2024-05-28 00:00:00
