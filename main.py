@@ -1,3 +1,4 @@
+import shutil
 import flet as ft
 import pantalla_facturas as pf
 import repath as rp
@@ -10,6 +11,9 @@ class UI(ft.UserControl):
 
         if not os.path.exists('EasyBill'):
             os.makedirs('EasyBill')
+        
+        if not os.path.exists('EasyBill/empresas_eliminadas'):
+            os.makedirs('EasyBill/empresas_eliminadas')
         
         if not os.path.isfile('EasyBill/empresas.csv'):
             with open('EasyBill/empresas.csv', 'w', newline='') as file:
@@ -34,6 +38,7 @@ class UI(ft.UserControl):
             ],
             actions_alignment=ft.MainAxisAlignment.END,
         )
+
         self.searh_field = ft.TextField(                        
                             suffix_icon = ft.icons.SEARCH,
                             label= "Buscar por el nombre",
@@ -264,6 +269,7 @@ class UI(ft.UserControl):
     def delete_company(self, event):
         company_name = event.control.parent.parent.cells[0].content.value # Get the company name from the first cell in the row
         self.lista_empresas.remove(company_name)
+        shutil.move('EasyBill/' + company_name, 'EasyBill/empresas_eliminadas/' + company_name)
         self.tablaDatos.rows.clear()
         with open('EasyBill/empresas.csv', 'r') as f:
             reader = csv.reader(f)
