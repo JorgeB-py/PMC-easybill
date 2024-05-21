@@ -1,0 +1,5 @@
+nombre: Factura con el texto más largo que se me ocurrió escribir para probar que las filas se adaptan al nombre de las facturas ingresadas
+Descripción: 
+Valor de la factura: 
+Saldo en deuda: 
+Fecha: 2024-05-29 00:00:00

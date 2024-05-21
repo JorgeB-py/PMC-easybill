@@ -1,0 +1,5 @@
+nombre: 4
+Descripción: 
+Valor de la factura: 
+Saldo en deuda: 
+Fecha: 2024-06-24 00:00:00

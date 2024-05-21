@@ -178,11 +178,13 @@ class UI(ft.UserControl):
     def go_home(self,e):
         self.page=e.page
         self.page.go("/")
-    
+    nombre = ""
     def go_facturas(self, event):
+        global nombre
         self.page=event.page
         # Nombre de la empresa y dirección de la carpeta
         self.pantalla_facturas=pf.__view__(self.page, event.control.parent.parent.cells[0].content.value, self.direcciones[event.control.parent.parent.cells[0].content.value])
+        nombre = event.control.parent.parent.cells[0].content.value
         self.page.go("/facturas")
     
     def route_change(self, route):
@@ -193,7 +195,7 @@ class UI(ft.UserControl):
                 ft.View(
                     "/facturas",
                     [
-                        ft.IconButton(icon=ft.icons.ARROW_BACK, on_click=self.go_home),
+                        ft.Row(alignment=ft.MainAxisAlignment.SPACE_BETWEEN,controls=[ft.IconButton(icon=ft.icons.ARROW_BACK, on_click=self.go_home),ft.Text(value = nombre, size=35, weight=ft.FontWeight.BOLD)]),
                         self.pantalla_facturas, # Botón para regresar a la pantalla principal (descomentar al final)
                     ],
                 )

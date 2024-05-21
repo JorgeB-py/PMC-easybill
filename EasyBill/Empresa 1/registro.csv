@@ -1,0 +1,10 @@
+nombre_factura,fecha_limite,facturado
+1.txt,2024-05-31 00:00:00,False
+2.txt,2024-05-21 00:00:00,False
+4.txt,2024-06-24 00:00:00,False
+5.txt,2025-03-02 00:00:00,False
+6.txt,2024-05-29 00:00:00,False
+7.txt,2024-05-30 00:00:00,True
+8.txt,2024-05-28 00:00:00,False
+Factura con nombre muy largo.txt,2024-06-28 00:00:00,True
+Factura con el texto más largo que se me ocurrió escribir para probar que las filas se adaptan al nombre de las facturas ingresadas.txt,2024-05-29 00:00:00,False
