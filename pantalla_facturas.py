@@ -274,7 +274,7 @@ def __view__(page, nombre_empresa, direccion_carpeta):
                 on_sort=lambda e: print(f"{e.column_index}, {e.ascending}"),
             ),
             ft.DataColumn(
-                ft.Text("Fecha de modificación"),
+                ft.Text("Fecha de vencimiento"),
                 on_sort=lambda e: print(f"{e.column_index}, {e.ascending}"),
             ),
         ]
@@ -306,16 +306,16 @@ def __view__(page, nombre_empresa, direccion_carpeta):
             fecha_obj = fecha_mod
         fecha_actual = datetime.datetime.now()
         diferencia = fecha_obj - fecha_actual
-        return diferencia.days
+        return abs(diferencia.days)
 
     def determinar_color_fila(dias_restantes):
-        if dias_restantes > 180:
+        if dias_restantes >= 180:
             return "blue"
-        if dias_restantes > 30:
+        elif dias_restantes >= 30:
             return "green"
-        elif dias_restantes > 7:
+        elif dias_restantes >= 7:
             return "yellow"
-        elif dias_restantes > 1:
+        elif dias_restantes >= 1:
             return "red"
         else:
             return "red"
@@ -354,7 +354,7 @@ def __view__(page, nombre_empresa, direccion_carpeta):
                 on_sort=lambda e: print(f"{e.column_index}, {e.ascending}"),
             ),
             ft.DataColumn(
-                ft.Text("Fecha de modificación"),
+                ft.Text("Fecha de vencimiento"),
                 on_sort=lambda e: print(f"{e.column_index}, {e.ascending}"),
             ),
         ]
@@ -530,13 +530,13 @@ def __view__(page, nombre_empresa, direccion_carpeta):
         vertical_alignment=ft.CrossAxisAlignment.CENTER,
         controls=[
             ft.Container(width=20, height=20, bgcolor="blue"),
-            ft.Text(" 6 meses restantes "),
+            ft.Text(" 6 meses o más "),
             ft.Container(width=20, height=20, bgcolor="green"),
-            ft.Text(" 1 mes restante "),
+            ft.Text(" menos de 6 meses "),
             ft.Container(width=20, height=20, bgcolor="yellow"),
-            ft.Text(" 1 semana restante "),
+            ft.Text(" menos de un mes "),
             ft.Container(width=20, height=20, bgcolor="red"),
-            ft.Text(" 1 día restante ")
+            ft.Text(" menos de una semana ")
         ]
     )
 
