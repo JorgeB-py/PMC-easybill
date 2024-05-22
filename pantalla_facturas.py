@@ -144,27 +144,6 @@ def __view__(page, nombre_empresa, direccion_carpeta):
         actions_alignment=ft.MainAxisAlignment.END,
     )
 
-    navigation_bar = ft.Container(
-        col=1,
-        expand=False,
-        height=120,
-        content=ft.Column(
-            controls=[
-                ft.Container(
-                    expand=True,
-                    content=ft.NavigationBar(
-                        bgcolor='black',
-                        selected_index=0,
-                        destinations=[
-                            ft.NavigationDestination(icon_content=ft.TextButton(text="USUARIO", icon=ft.icons.PERSON, style=ft.ButtonStyle(color='white', bgcolor='black'))),
-                            ft.NavigationDestination(icon_content=ft.TextButton(text="NOTIFICACIONES", icon=ft.icons.NOTIFICATIONS_ACTIVE, style=ft.ButtonStyle(color='white', bgcolor='black')))
-                        ]
-                    )
-                ),
-            ]
-        )
-    )
-
     archivos = os.listdir(direccion_carpeta + "/no_facturadas/")
     datos1 = [
         [
@@ -264,6 +243,9 @@ def __view__(page, nombre_empresa, direccion_carpeta):
         page.update()
 
     tabla1 = ft.DataTable(
+        border=ft.border.all(1, 'black'),
+        border_radius=10,
+        horizontal_lines=ft.border.BorderSide(1, 'black'),
         show_checkbox_column=True,
         sort_ascending=True,
         expand=False,
@@ -344,6 +326,9 @@ def __view__(page, nombre_empresa, direccion_carpeta):
             print(f"Error al actualizar las tablas: {e}")
 
     tabla2 = ft.DataTable(
+        border=ft.border.all(1, 'black'),
+        border_radius=10,
+        horizontal_lines=ft.border.BorderSide(1, 'black'),
         sort_ascending=True,
         show_checkbox_column=True,
         data_row_max_height=float("inf"),

@@ -1,0 +1,5 @@
+nombre: hola
+Descripción: no c
+Valor de la factura: 50000
+Saldo en deuda: 50000
+Fecha: 2024-05-22 00:00:00
