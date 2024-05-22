@@ -101,11 +101,12 @@ def __view__(page, nombre_empresa, direccion_carpeta):
         if fecha_carga.value != "":
             for file in archivos_a_cargar:
                 nombre_archivo = Path(file.path).stem
-                ruta_archivo = os.path.join(direccion_carpeta + carpeta_destino + "/" + nombre_archivo + ".txt")
+                extension= Path(file.path).suffix
+                ruta_archivo = os.path.join(direccion_carpeta + carpeta_destino + "/" + nombre_archivo + extension)
                 shutil.move(file.path, ruta_archivo)
                 with open(os.path.join(direccion_carpeta, "registro" + ".csv"), mode="a", newline='') as file:
                     writer = csv.writer(file)
-                    writer.writerow([nombre_archivo, fecha_carga.value, facturado])
+                    writer.writerow([nombre_archivo+extension, fecha_carga.value, facturado])
             cargar_tablas()
             page.update()
         close_dlg_fecha(e)
@@ -137,7 +138,7 @@ def __view__(page, nombre_empresa, direccion_carpeta):
         title=ft.Text("Cargar Archivos"),
         actions=[
             fecha_carga,
-            ft.ElevatedButton("Agregar", on_click=agregar_archivos_cargados),
+            ft.ElevatedButton("Agregar", on_click=lambda event: (agregar_archivos_cargados(event))),
             ft.ElevatedButton("Cancelar", on_click=close_dlg_fecha)
         ],
         actions_alignment=ft.MainAxisAlignment.END,
