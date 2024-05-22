@@ -329,10 +329,10 @@ def __view__(page, nombre_empresa, direccion_carpeta):
         border=ft.border.all(1, 'black'),
         border_radius=10,
         horizontal_lines=ft.border.BorderSide(1, 'black'),
-        sort_ascending=True,
         show_checkbox_column=True,
-        data_row_max_height=float("inf"),
+        sort_ascending=True,
         expand=False,
+        data_row_max_height=float("inf"),
         width= 450,
         columns=[
             ft.DataColumn(
