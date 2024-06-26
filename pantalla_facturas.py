@@ -474,8 +474,8 @@ def __view__(page, nombre_empresa, direccion_carpeta):
     boton_eliminar = ft.ElevatedButton(text="Eliminar Facturas Seleccionadas", on_click=eliminar_facturas_seleccionadas)
 
     # Crear botones de "Añadir elemento"
-    boton_agregar_tabla_1 = ft.ElevatedButton(text="Crear Factura no facturada", on_click=open_dlg_modal)
-    boton_agregar_tabla_2 = ft.ElevatedButton(text="Crear Factura facturada", on_click=open_dlg_modal_2)
+    boton_agregar_tabla_1 = ft.ElevatedButton(text="Crear cotización no facturada", on_click=open_dlg_modal)
+    boton_agregar_tabla_2 = ft.ElevatedButton(text="Crear cotización facturada", on_click=open_dlg_modal_2)
 
     # Crear botones cargar archivos
     boton_agregar_archivos1 = ft.ElevatedButton(text="Cargar archivos", on_click=lambda event: files_p("/no_facturadas"))
