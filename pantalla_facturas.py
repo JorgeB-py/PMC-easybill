@@ -143,12 +143,13 @@ def __view__(page, nombre_empresa, direccion_carpeta):
         ],
         actions_alignment=ft.MainAxisAlignment.END,
     )
+    date_format = "%Y-%m-%d %H:%M:%S"
 
     archivos = os.listdir(direccion_carpeta + "/no_facturadas/")
     datos1 = [
         [
             archivo,
-            datetime.datetime.fromtimestamp(os.path.getmtime(os.path.join(direccion_carpeta + "/no_facturadas/" + archivo)))
+            datetime.datetime.fromtimestamp(os.path.getmtime(os.path.join(direccion_carpeta + "/no_facturadas/" + archivo))).strftime(date_format)
         ]
         for archivo in archivos
     ]
@@ -157,10 +158,42 @@ def __view__(page, nombre_empresa, direccion_carpeta):
     datos2 = [
         [
             archivo,
-            datetime.datetime.fromtimestamp(os.path.getmtime(os.path.join(direccion_carpeta + "/facturadas/" + archivo)))
+            datetime.datetime.fromtimestamp(os.path.getmtime(os.path.join(direccion_carpeta + "/facturadas/" + archivo))).strftime(date_format)
         ]
         for archivo in archivos2
     ]
+    
+    # Crear un diccionario para almacenar la información de los archivos
+    registro_dict = {}
+
+    # Añadir datos de archivos no facturados al diccionario
+    for archivo, fecha in datos1:
+        registro_dict[archivo] = [archivo, fecha, 'False']
+
+    # Añadir datos de archivos facturados al diccionario
+    for archivo, fecha in datos2:
+        registro_dict[archivo] = [archivo, fecha, 'True']
+
+    # Leer el archivo CSV existente y actualizar la información
+    registro_path = Path(direccion_carpeta) / "registro.csv"
+    if registro_path.exists():
+        with open(registro_path, mode="r", newline='') as archivo:
+            reader = csv.reader(archivo)
+            encabezados = next(reader)  # Leer la primera fila de encabezados
+            for fila in reader:
+                archivo = fila[0]
+                if archivo not in registro_dict:
+                    # Conservar la información existente si el archivo no está en datos1 o datos2
+                    registro_dict[archivo] = fila
+
+    # Escribir los datos actualizados de vuelta en el archivo CSV
+    with open(registro_path, mode="w", newline='') as archivo:
+        writer = csv.writer(archivo)
+        writer.writerow(["nombre", "fecha", "facturada"])  # Escribir encabezados
+        for fila in registro_dict.values():
+            writer.writerow(fila)
+    
+    
 
     search_field = ft.TextField(label="Buscar por nombre de factura", on_change=lambda e: filtrar_tablas())
     date_field_text = ft.Text("Filtrar por fecha: ")
@@ -257,7 +290,7 @@ def __view__(page, nombre_empresa, direccion_carpeta):
                 on_sort=lambda e: print(f"{e.column_index}, {e.ascending}"),
             ),
             ft.DataColumn(
-                ft.Text("Fecha de vencimiento"),
+                ft.Text("Fecha de creación"),
                 on_sort=lambda e: print(f"{e.column_index}, {e.ascending}"),
             ),
         ]
@@ -293,15 +326,15 @@ def __view__(page, nombre_empresa, direccion_carpeta):
 
     def determinar_color_fila(dias_restantes):
         if dias_restantes >= 180:
-            return "blue"
+            return "red"
         elif dias_restantes >= 30:
-            return "green"
-        elif dias_restantes >= 7:
             return "yellow"
+        elif dias_restantes >= 7:
+            return "green"
         elif dias_restantes >= 1:
-            return "red"
+            return "blue"
         else:
-            return "red"
+            return "blue"
 
     def cargar_tabla_1(nombre, fecha_mod):
         dias_restantes = calcular_dias_restantes(fecha_mod)
@@ -340,7 +373,7 @@ def __view__(page, nombre_empresa, direccion_carpeta):
                 on_sort=lambda e: print(f"{e.column_index}, {e.ascending}"),
             ),
             ft.DataColumn(
-                ft.Text("Fecha de vencimiento"),
+                ft.Text("Fecha de creación"),
                 on_sort=lambda e: print(f"{e.column_index}, {e.ascending}"),
             ),
         ]
@@ -370,7 +403,7 @@ def __view__(page, nombre_empresa, direccion_carpeta):
     with open(Path(direccion_carpeta) / "registro.csv", mode="r") as archivo:
         reader = csv.reader(archivo)
         for fila in reader:
-            if fila[0] != "nombre_factura":
+            if fila[0] != "nombre":
                 facturado = fila[2] == 'True'  # Convertir cadena a booleano
                 if not facturado:
                     cargar_tabla_1(fila[0], fila[1])
@@ -447,12 +480,13 @@ def __view__(page, nombre_empresa, direccion_carpeta):
         with open(Path(direccion_carpeta) / "registro.csv", mode="r") as archivo:
             reader = csv.reader(archivo)
             for fila in reader:
-                if fila[0] != "nombre_factura":
+                if fila[0] != "nombre":
                     facturado = fila[2] == 'True'  # Convertir cadena a booleano
                     if not facturado:
                         cargar_tabla_1(fila[0], fila[1])
                     else:
                         cargar_tabla_2(fila[0], fila[1])
+        page.update()
 
     def on_dialog_result(e):
         open_dlg_fecha(e, e.files, direccion1)
@@ -515,13 +549,13 @@ def __view__(page, nombre_empresa, direccion_carpeta):
     legend = ft.Row(
         vertical_alignment=ft.CrossAxisAlignment.CENTER,
         controls=[
-            ft.Container(width=20, height=20, bgcolor="blue"),
-            ft.Text(" 6 meses o más "),
-            ft.Container(width=20, height=20, bgcolor="green"),
-            ft.Text(" menos de 6 meses "),
-            ft.Container(width=20, height=20, bgcolor="yellow"),
-            ft.Text(" menos de un mes "),
             ft.Container(width=20, height=20, bgcolor="red"),
+            ft.Text(" 6 meses o más "),
+            ft.Container(width=20, height=20, bgcolor="yellow"),
+            ft.Text(" menos de 6 meses "),
+            ft.Container(width=20, height=20, bgcolor="green"),
+            ft.Text(" menos de un mes "),
+            ft.Container(width=20, height=20, bgcolor="blue"),
             ft.Text(" menos de una semana ")
         ]
     )
